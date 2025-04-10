@@ -5,3 +5,4 @@ logs/
 *.log.*
 *.log.*.*
 *.log.*.*.*
+MLOPS_PROJECT_1.egg-info/
