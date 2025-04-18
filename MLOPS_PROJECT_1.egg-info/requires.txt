@@ -6,3 +6,5 @@ scikit-learn
 google-cloud-storage
 pyyaml
 imbalanced-learn
+lightgbm
+mlflow
