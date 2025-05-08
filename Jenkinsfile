@@ -4,7 +4,7 @@ pipeline{
     environment{
         VENV_DIR = 'venv'
         GCP_PROJECT = 'clear-shadow-456404-i1'
-        GCLOD_PATH = '/var/jenkins_home/google-clod-sdk/bin'
+        GCLOUD_PATH = '/var/jenkins_home/google-cloud-sdk/bin'
     }
     stages{
         stage('Cloning Github repo to Jenkins'){
@@ -34,7 +34,7 @@ pipeline{
                 {
                     script{
                         sh '''
-                        export PATH=$PATH:${GCLOD_PATH}
+                        export PATH=$PATH:${GCLOUD_PATH}    
                         gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}
                         
                         gcloud config set project ${GCP_PROJECT}
