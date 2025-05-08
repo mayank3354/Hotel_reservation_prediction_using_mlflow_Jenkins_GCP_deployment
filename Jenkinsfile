@@ -3,6 +3,8 @@ pipeline{
 
     environment{
         VENV_DIR = 'venv'
+        GCP_PROJECT = 'clear-shadow-456404-i1'
+        GCLOD_PATH = '/var/jenkins_home/google-clod-sdk/bin'
     }
     stages{
         stage('Cloning Github repo to Jenkins'){
@@ -10,9 +12,9 @@ pipeline{
                 script{
                     echo 'Cloning Github repo to Jenkins........'
                     checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-token', url: 'https://github.com/mayank3354/Hotel_reservation_prediction_using_mlflow_Jenkins_GCP_deployment.git']])
+                    }
                 }
             }
-        }
         stage('Setting up virtual environment and installing dependencies'){
             steps{
                 script{
@@ -23,6 +25,25 @@ pipeline{
                     pip install --upgrade pip
                     pip install -e .
                     '''
+                }
+            }
+        }
+        stage('Building and pushing Docker image to GCR'){
+            steps{
+                withCredentials([file(credentialsId: 'gcp-key', variable: 'GOOGLE_APPLICATION_CREDENTIALS')])
+                {
+                    script{
+                        sh '''
+                        export PATH=$PATH:${GCLOD_PATH}
+                        gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}
+                        
+                        gcloud config set project ${GCP_PROJECT}
+                        gcloud auth configure-docker --quiet
+                        docker build -t gcr.io/${GCP_PROJECT}/hotel-reservation-prediction:latest .
+                        docker push gcr.io/${GCP_PROJECT}/hotel-reservation-prediction:latest
+                        
+                        ''' 
+                    }
                 }
             }
         }
